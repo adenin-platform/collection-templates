@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "23f6bfe0-dcc0-4f34-b2b4-a7673e662861",
+		"name": "rss",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "bbc-news",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "630ecb3e-77da-41cb-bfe4-6ac124302845",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7e2c96ec-535d-4237-bf10-5d21c354c363",
+						"exec": [
+							"var body = pm.response.text();",
+							"var js = xml2Json(body);",
+							"",
+							"console.log(js);",
+							"",
+							"var items = js.rss.channel.item;",
+							"",
+							"var model = {",
+							"    _card: {",
+							"        title: \"BBC News\",",
+							"        type: \"status-list\"",
+							"    },",
+							"    items: []",
+							"};",
+							"",
+							"for (var i = 0; i < items.length && i < 3; i++) {",
+							"    var raw = items[i];",
+							"    ",
+							"    raw.date = new Date(raw.pubDate);",
+							"    raw.id = raw.link;",
+							"    ",
+							"    model.items.push(raw);",
+							"}",
+							"",
+							"var template = `",
+							"    <script id=\"loader\" src=\"https://components.adenin.com/components/at-card-preview/loader.js\"></script>",
+							"`;",
+							"",
+							"pm.visualizer.set(template, model);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://feeds.bbci.co.uk/news/rss.xml?edition=uk",
+					"protocol": "http",
+					"host": [
+						"feeds",
+						"bbci",
+						"co",
+						"uk"
+					],
+					"path": [
+						"news",
+						"rss.xml"
+					],
+					"query": [
+						{
+							"key": "edition",
+							"value": "uk"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "adenin-blog",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f68cd026-27da-47a8-910d-9f8ace99bdbe",
+						"exec": [
+							"var body = pm.response.text();",
+							"var js = xml2Json(body);",
+							"",
+							"var items = js.rss.channel.item;",
+							"",
+							"var model = {",
+							"    _card: {",
+							"        title: \"adenin Blog\",",
+							"        type: \"status-list\"",
+							"    },",
+							"    items: []",
+							"};",
+							"",
+							"for (var i = 0; i < items.length && i < 3; i++) {",
+							"    var raw = items[i];",
+							"    ",
+							"    raw.date = new Date(raw.pubDate);",
+							"    raw.id = raw.link;",
+							"    ",
+							"    if (raw[\"media:thumbnail\"]) raw.thumbnail = raw[\"media:thumbnail\"][\"$\"].url;",
+							"    ",
+							"    model.items.push(raw);",
+							"}",
+							"",
+							"var template = `",
+							"    <script id=\"loader\" src=\"https://components.adenin.com/components/at-card-preview/loader.js\"></script>",
+							"`;",
+							"",
+							"pm.visualizer.set(template, model);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://www.adenin.com/atom.xml",
+					"protocol": "https",
+					"host": [
+						"www",
+						"adenin",
+						"com"
+					],
+					"path": [
+						"atom.xml"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
