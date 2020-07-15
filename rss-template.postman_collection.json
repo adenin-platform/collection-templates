@@ -65,18 +65,18 @@
 					"raw": "{{url.raw}}",
 					"protocol": "{{url.protocol}}",
 					"host": [
-						{{url.hosts}}
+  					""
 					],
 					"path": [
-						{{url.path}}
+						""
 					],
 					"query": [
-						{{url.query}}
+						""
 					]
 				}
 			},
 			"response": []
-		},
+		}
 	],
 	"protocolProfileBehavior": {}
 }
