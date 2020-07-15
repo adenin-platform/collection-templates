@@ -1,0 +1,82 @@
+{
+	"info": {
+		"_postman_id": "{{postmanId}}",
+		"name": "{{title}} RSS feed Card",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "{{title}}",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "{{requestId}}",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "{{scriptId}}",
+						"exec": [
+							"var body = pm.response.text();",
+							"var js = xml2Json(body);",
+							"",
+							"console.log(js);",
+							"",
+							"var items = js.rss.channel.item;",
+							"",
+							"var model = {",
+							"    _card: {",
+							"        title: \"{{title}}\",",
+							"        type: \"status-list\"",
+							"    },",
+							"    items: []",
+							"};",
+							"",
+							"for (var i = 0; i < items.length && i < 3; i++) {",
+							"    var raw = items[i];",
+							"    ",
+							"    raw.date = new Date(raw.pubDate);",
+							"    raw.id = raw.link;",
+							"    ",
+							"    model.items.push(raw);",
+							"}",
+							"",
+							"var template = `",
+							"    <script id=\"loader\" src=\"https://components.adenin.com/components/at-card-preview/loader.js\"></script>",
+							"`;",
+							"",
+							"pm.visualizer.set(template, model);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url.raw}}",
+					"protocol": "{{url.protocol}}",
+					"host": [
+						{{url.hosts}}
+					],
+					"path": [
+						{{url.path}}
+					],
+					"query": [
+						{{url.query}}
+					]
+				}
+			},
+			"response": []
+		},
+	],
+	"protocolProfileBehavior": {}
+}
