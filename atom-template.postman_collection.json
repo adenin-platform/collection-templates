@@ -1,0 +1,84 @@
+{
+  "info": {
+    "_postman_id": "{{postmanId}}",
+    "name": "{{title}} RSS feed Card",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "{{title}}",
+      "event": [	
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "{{requestId}}",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "id": "{{scriptId}}",
+            "exec": [
+              "var body = pm.response.text();",
+              "var js = xml2Json(body);",
+              "",
+	      "var items = js.feed.entry;",
+              "",
+              "var model = {",
+              "    _card: {",
+              "        title: \"{{title}}\",",
+              "        type: \"status-list\"",
+              "    },",
+              "    items: []",
+              "};",
+              "",
+              "for (var i = 0; i < items.length && i < 3; i++) {",
+              "    var raw = items[i];",
+              "    ",
+              "    model.items.push({",
+              "        id: raw.id,",
+              "        title: raw.title,",
+              "        description: raw[\"media:group\"][\"media:description\"],",
+              "        date: new Date(raw.published).toISOString(),",
+              "        link: raw.link.$.href,",
+              "        thumbnail: raw[\"media:group\"][\"media:thumbnail\"].$.url",
+              "    });",
+              "}",
+              "",
+              "var template = `",
+              "    <script id=\"loader\" src=\"https://components.adenin.com/components/at-card-preview/loader.js\"></script>",
+              "`;",
+              "",
+              "pm.visualizer.set(template, model);",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url.raw}}",
+          "protocol": "{{url.protocol}}",
+          "host": [
+            ""
+          ],
+          "path": [
+            ""
+          ],
+          "query": [
+		""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "protocolProfileBehavior": {}
+}
