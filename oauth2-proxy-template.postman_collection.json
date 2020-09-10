@@ -17,9 +17,7 @@
 							"pm.environment.set(\"activity\", {\r",
 							"    Request: {\r",
 							"        Path: '{{url.path}}',\r",
-							"        Query: {\r",
-							"            {{url.query}}\r",
-							"        }\r",
+							"        {{url.query}}
 							"    }\r",
 							"});\r",
 							"\r",
