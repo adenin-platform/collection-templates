@@ -14,20 +14,40 @@
 					"script": {
 						"id": "{{requestId}}",
 						"exec": [
-							"pm.environment.set(\"activity\", {\r",
-							"    Request: {\r",
-							"        Path: '{{url.path}}',\r",
-							"        {{url.query}}",
-							"    }\r",
+							"\r",
+							"// activity provides the execution context for the connector service\r",
+							"// should be adjusted for testing with PostMan, but is immutable when executed by app.adenin.com\r",
+							"pm.environment.set(\"activity\", \r",
+							"{\r",
+							"  \"Context\": {\r",
+							"    \"UserId\": 815,\r",
+							"    \"UserName\": \"support@adenin.com\",\r",
+							"    \"UserLocale\": \"en-US\",\r",
+							"    \"UserTimezone\": \"America/Los_Angeles\",\r",
+							"  },\r",
+							"  \"Request\": {\r",
+							"    \"Path\": \"\",\r",
+							"    \"Handler\": null,\r",
+							"    \"Method\": \"POST\",\r",
+							"    \"Action\": null,\r",
+							"    \"Query\": {},\r",
+							"    \"Data\": null  // incoming request data\r",
+							"  },\r",
+							"  \"Response\": {\r",
+							"    \"ErrorCode\": 0,\r",
+							"    \"Data\": {}\r",
+							"  }\r",
 							"});\r",
 							"\r",
-							"var activity = pm.environment.get(\"activity\");\r",
 							"\r",
+							"var activity = pm.environment.get(\"activity\");\r",
+							"pm.environment.set(\"METHOD\", activity.Request.Method || \"GET\"); \r",
 							"pm.environment.set(\"path\", activity.Request.Path);\r",
 							"\r",
 							"var query = activity.Request.Query ? Object.keys(activity.Request.Query).map(key => `${key}=${activity.Request.Query[key]}`).join('&') : '';\r",
+							"pm.environment.set(\"query\", query ? \"?\" + query : \"\");\r",
 							"\r",
-							"pm.environment.set(\"query\", query);\r",
+							"pm.environment.set(\"request\", activity.Request.Data != null ? JSON.stringify(activity.Request.Data): \"\");\r",
 							""
 						],
 						"type": "text/javascript"
@@ -53,18 +73,89 @@
 				}
 			],
 			"request": {
-				"method": "GET",
+                "auth": {
+                    "oauth2": [
+                        {
+                            "key": "useBrowser",
+                            "value": false,
+                            "type": "boolean"
+                        },
+                        {
+                            "key": "challengeAlgorithm",
+                            "value": "S256",
+                            "type": "string"
+                        },
+                        {
+                            "key": "state",
+                            "value": "dev",
+                            "type": "string"
+                        },
+                        {
+                            "key": "scope",
+                            "value": "{{_Scopes}}",
+                            "type": "string"
+                        },
+                        {
+                            "key": "redirect_uri",
+                            "value": "https://app.adenin.com/oauth2connector/returnUrl",
+                            "type": "string"
+                        },
+                        {
+                            "key": "grant_type",
+                            "value": "authorization_code",
+                            "type": "string"
+                        },
+                        {
+                            "key": "clientSecret",
+                            "value": "{{_ClientSecret}}",
+                            "type": "string"
+                        },
+                        {
+                            "key": "clientId",
+                            "value": "{{_ClientId}}",
+                            "type": "string"
+                        },
+                        {
+                            "key": "authUrl",
+                            "value": "{{_AccessCodeServiceEndpoint}}",
+                            "type": "string"
+                        },
+                        {
+                            "key": "addTokenTo",
+                            "value": "header",
+                            "type": "string"
+                        },
+                        {
+                            "key": "client_authentication",
+                            "value": "header",
+                            "type": "string"
+                        },
+                        {
+                            "key": "accessTokenUrl",
+                            "value": "{{_AccessTokenServiceEndpoint}}",
+                            "type": "string"
+                        },
+                        {
+                            "key": "tokenType",
+                            "type": "any"
+                        }
+                    ]
+                },
+				"method": "{{METHOD}}",
 				"header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{{request}}",
+                    "options": {
+                        "raw": {
+                        "language": "json"
+                        }
+                    }
+                },
 				"url": {
-					"raw": "{{url.raw}}",
+					"raw": "{{url.raw}}{{path}}{{query}}",
 					"protocol": "{{url.protocol}}",
 					"host": [
-						""
-					],
-					"path": [
-						""
-					],
-					"query": [
 						""
 					]
 				}
@@ -76,20 +167,20 @@
 		"type": "oauth2",
 		"oauth2": [
 			{
-				"key": "accessToken",
-				"value": "eyJ0eXAiOiJKV1QiLCJub25jZSI6IldRcE95Q1RJaXdxeFUteC13RUU2N1BXZ2x2eHhwbkZ0ZnJMeXFrTnYyX2siLCJhbGciOiJSUzI1NiIsIng1dCI6ImppYk5ia0ZTU2JteFBZck45Q0ZxUms0SzRndyIsImtpZCI6ImppYk5ia0ZTU2JteFBZck45Q0ZxUms0SzRndyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9jZTRjYzY2MS00NTA2LTRkNDgtOGM2NC1jNWIwOTBhYTQ2ZmIvIiwiaWF0IjoxNTk5NDY2MjcyLCJuYmYiOjE1OTk0NjYyNzIsImV4cCI6MTU5OTQ3MDE3MiwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFVUUF1LzhRQUFBQXZLTC85TEJQZUpwQVVDQzFvT3I5Z2ZJa2lxLyt1ZEhEUG9zKzBLcHpWdzJtclhwNXJZdld0WjduQ3ZIS3plRkxvYU9ybC9pMnNXak9Yeit1V2c0WHBnPT0iLCJhbXIiOlsicHdkIiwibWZhIl0sImFwcF9kaXNwbGF5bmFtZSI6IkRpZ2l0YWwgQXNzaXN0YW50IiwiYXBwaWQiOiI3OTg0MjljNy02NmE3LTQ2MmItOWJjNy04OGUxMjRlNjgwYjAiLCJhcHBpZGFjciI6IjEiLCJmYW1pbHlfbmFtZSI6Ik1jTmFsbHkiLCJnaXZlbl9uYW1lIjoiT2xpdmVyIiwiaWR0eXAiOiJ1c2VyIiwiaXBhZGRyIjoiOTIuMjIuMTY5LjE1OSIsIm5hbWUiOiJPbGl2ZXIgTWNOYWxseSIsIm9pZCI6ImNjZWFjOGVlLTU2MjctNGJkMy05YzFiLWU2ODRhMTdlZTNiYiIsInBsYXRmIjoiMyIsInB1aWQiOiIxMDAzN0ZGRUFDQzg5MDkxIiwicmgiOiIwLkFBQUFZY1pNemdaRlNFMk1aTVd3a0twRy04Y3BoSG1uWml0R204ZUk0U1RtZ0xBT0FBMC4iLCJzY3AiOiJDYWxlbmRhcnMuUmVhZCBDYWxlbmRhcnMuUmVhZFdyaXRlLlNoYXJlZCBEaXJlY3RvcnkuUmVhZC5BbGwgRmlsZXMuUmVhZCBHcm91cC5SZWFkLkFsbCBNYWlsLlJlYWRCYXNpYyBOb3Rlcy5SZWFkLkFsbCBQZW9wbGUuUmVhZCBQZW9wbGUuUmVhZC5BbGwgU2l0ZXMuUmVhZC5BbGwgVGFza3MuUmVhZFdyaXRlIFVzZXIuUmVhZCBVc2VyLlJlYWQuQWxsIHByb2ZpbGUgb3BlbmlkIGVtYWlsIiwic2lnbmluX3N0YXRlIjpbImttc2kiXSwic3ViIjoiUjRFZ1k1TlkxTF94eDFxb0E4T2I1TUc1dm1HU1VPWldlc0MxNjA2REEzMCIsInRlbmFudF9yZWdpb25fc2NvcGUiOiJOQSIsInRpZCI6ImNlNGNjNjYxLTQ1MDYtNGQ0OC04YzY0LWM1YjA5MGFhNDZmYiIsInVuaXF1ZV9uYW1lIjoib2xpdmVyLm1jbmFsbHlAYWRlbmluLmNvbSIsInVwbiI6Im9saXZlci5tY25hbGx5QGFkZW5pbi5jb20iLCJ1dGkiOiJTRE9NRDlSSkVrYVV0TXZFYkNVa0FBIiwidmVyIjoiMS4wIiwieG1zX3N0Ijp7InN1YiI6IjJvZTFobExNa1J6UldBR2poTk5sV1RwWjRiRmtDUWNmTFFLdU9hMzNzbDAifSwieG1zX3RjZHQiOjEzODQ0NTgzMjV9.sJYfbta5LRSNRgacwuqscFPxlq-McycBnRw6fKvDuB653gYlQgwGuwKgygg3H5L9Ejx8Cdh0Nb86SvzSSBNjhw_FGQx-qfMrymkHBOn2ZqhODJQ4SEVpoy_-gLHRPoLmxHWb-XNsoZecOHp9CW5WKuwjIFbS05MHTphm3rjo7mIc79baoG2ShhSdqPzVh2KUwWpdhb1uD2ckM8cpyU0ybiWZbPKRMPUFMcsOGyjLv1sh2e74cpYwMHH0emLmTVcgACl3GoKTljXnop4e801symJN780rqTBIjm0WsDvgn4ALzJP48Frwk1r9a1UaTlEEI6RanyQR1Z-yopsY7lqI2g",
-				"type": "string"
-			},
-			{
-				"key": "tokenType",
-				"value": "Bearer",
-				"type": "string"
-			},
-			{
-				"key": "addTokenTo",
-				"value": "header",
-				"type": "string"
-			}
+                "key": "accessToken",
+                "value": "",
+                "type": "string"
+            },
+            {
+                "key": "tokenType",
+                "value": "Bearer",
+                "type": "string"
+            },
+            {
+                "key": "addTokenTo",
+                "value": "header",
+                "type": "string"
+            }
 		]
 	},
 	"event": [
@@ -116,27 +207,22 @@
 	],
 	"variable": [
 		{
-			"id": "f68a5c8e-db17-4e20-bccd-6f781184a70d",
 			"key": "_AccessCodeServiceEndpoint",
 			"value": "{{AccessCodeServiceEndpoint}}"
 		},
 		{
-			"id": "f1e4072b-5af5-41bc-a2a6-ebfbd221367a",
 			"key": "_AccessTokenServiceEndpoint",
 			"value": "{{AccessTokenServiceEndpoint}}"
 		},
 		{
-			"id": "ef05f1c2-53be-4d48-a274-9915bb27ad1d",
 			"key": "_ClientId",
 			"value": "{{ClientId}}"
 		},
 		{
-			"id": "e844e1bf-9a2e-4264-9c40-de80a0705c71",
 			"key": "_ClientSecret",
 			"value": "{{ClientSecret}}"
 		},
 		{
-			"id": "c06261d9-28a5-4993-a116-dd92ab089137",
 			"key": "_Scopes",
 			"value": "{{Scopes}}"
 		}
