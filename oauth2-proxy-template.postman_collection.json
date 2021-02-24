@@ -97,7 +97,7 @@
                         },
                         {
                             "key": "redirect_uri",
-                            "value": "https://app.adenin.com/oauth2connector/returnUrl",
+                            "value": "http://localhost:3000/callback",
                             "type": "string"
                         },
                         {
