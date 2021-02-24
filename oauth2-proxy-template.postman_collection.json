@@ -73,9 +73,32 @@
 				}
 			],
 			"request": {
-                "auth": {
-                    "oauth2": [
-                        {
+				"method": "{{METHOD}}",
+				"header": [],
+				"body": {
+				    "mode": "raw",
+				    "raw": "{{request}}",
+				    "options": {
+					"raw": {
+					"language": "json"
+					}
+				    }
+				},
+				"url": {
+					"raw": "{{url.raw}}{{path}}{{query}}",
+					"protocol": "{{url.protocol}}",
+					"host": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
                             "key": "useBrowser",
                             "value": false,
                             "type": "boolean"
@@ -139,48 +162,6 @@
                             "key": "tokenType",
                             "type": "any"
                         }
-                    ]
-                },
-				"method": "{{METHOD}}",
-				"header": [],
-                "body": {
-                    "mode": "raw",
-                    "raw": "{{request}}",
-                    "options": {
-                        "raw": {
-                        "language": "json"
-                        }
-                    }
-                },
-				"url": {
-					"raw": "{{url.raw}}{{path}}{{query}}",
-					"protocol": "{{url.protocol}}",
-					"host": [
-						""
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"auth": {
-		"type": "oauth2",
-		"oauth2": [
-			{
-                "key": "accessToken",
-                "value": "",
-                "type": "string"
-            },
-            {
-                "key": "tokenType",
-                "value": "Bearer",
-                "type": "string"
-            },
-            {
-                "key": "addTokenTo",
-                "value": "header",
-                "type": "string"
-            }
 		]
 	},
 	"event": [
