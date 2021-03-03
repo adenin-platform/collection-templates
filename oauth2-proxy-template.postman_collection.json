@@ -85,10 +85,16 @@
 				    }
 				},
 				"url": {
-					"raw": "{{url.raw}}{{path}}{{query}}",
+					"raw": "{{url.raw}}{{path}}?{{query}}",
 					"protocol": "{{url.protocol}}",
 					"host": [
 						""
+					],
+					"query": [
+						{
+							"key": "{{query}}",
+							"value": null
+						}
 					]
 				}
 			},
