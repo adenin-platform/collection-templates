@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "{{postmanId}}",
 		"name": "{{name}}",
-		"description": "# {{title}}\r\n\r\n![logo]({{logoUrl}})\r\n\r\n## Required Scopes\n{{requiredScopesList}}\r\n\r\n## Scopes\n{{ScopesList}}",
+		"description": "# {{title}}\r\n\r\n![logo]({{logoUrl}})\r\n\r\n## Required Scopes\n{{requiredScopesList}}\n\n## Scopes\n{{ScopesList}}",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
