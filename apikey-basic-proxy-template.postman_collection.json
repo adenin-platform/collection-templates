@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "{{postmanId}}",
+		"name": "{{name}}",
+		"description": "# {{title}}\r\n\r\n![logo]({{logoUrl}})",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "proxy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "{{requestId}}",
+						"exec": [
+							"\r",
+							"// activity provides the execution context for the connector service\r",
+							"// should be adjusted for testing with PostMan, but is immutable when executed by app.adenin.com\r",
+							"pm.environment.set(\"activity\", \r",
+							"{\r",
+							"  \"Context\": {\r",
+							"    \"UserId\": 815,\r",
+							"    \"UserName\": \"support@adenin.com\",\r",
+							"    \"UserLocale\": \"en-US\",\r",
+							"    \"UserTimezone\": \"America/Los_Angeles\",\r",
+							"  },\r",
+							"  \"Request\": {\r",
+							"    \"Path\": \"\",\r",
+							"    \"Handler\": null,\r",
+							"    \"Method\": \"GET\",\r",
+							"    \"Action\": null,\r",
+							"    \"Query\": {},\r",
+							"    \"Data\": null  // incoming request data\r",
+							"  },\r",
+							"  \"Response\": {\r",
+							"    \"ErrorCode\": 0,\r",
+							"    \"Data\": {}\r",
+							"  }\r",
+							"});\r",
+							"\r",
+							"\r",
+							"var activity = pm.environment.get(\"activity\");\r",
+							"pm.environment.set(\"METHOD\", activity.Request.Method || \"GET\"); \r",
+							"pm.environment.set(\"path\", activity.Request.Path);\r",
+							"\r",
+							"var query = activity.Request.Query ? Object.keys(activity.Request.Query).map(key => `${key}=${activity.Request.Query[key]}`).join('&') : '';\r",
+							"\r",
+							"pm.environment.set(\"query\", (query ? query : \"\"));\r",
+							"\r",
+							"pm.environment.set(\"request\", activity.Request.Data != null ? JSON.stringify(activity.Request.Data): \"\");\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "{{scriptId}}",
+						"exec": [
+							"var template = `<script id=\"loader\" src=\"https://components.adenin.com/components/at-card-preview/loader.js\"></script>`;\r",
+							"var model = pm.response.json();\r",
+							"\r",
+							"model._card = {\r",
+							"    type: 'status'\r",
+							"};\r",
+							"\r",
+							"pm.visualizer.set(template, model);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "{{METHOD}}",
+				"header": [],
+				"body": {
+				    "mode": "raw",
+				    "raw": "{{request}}",
+				    "options": {
+					"raw": {
+				            "language": "json"
+				         }
+				     }
+				},
+				"url": {
+					"raw": "{{url.raw}}{{path}}?{{query}}",
+					"protocol": "{{url.protocol}}",
+					"host": [
+						""
+					],
+					"query": [
+						{
+							"key": "{{query}}",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{apiKeyValue}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{apiKeyName}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "{{requestId}}",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "{{scriptId}}",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+  		{
+          "key": "API_Key",
+          "value": "{{apiKeyValue}}"
+		  }
+	],
+	"protocolProfileBehavior": {}
+}
