@@ -45,9 +45,8 @@
 							"pm.environment.set(\"path\", activity.Request.Path);\r",
 							"\r",
 							"var query = activity.Request.Query ? Object.keys(activity.Request.Query).map(key => `${key}=${activity.Request.Query[key]}`).join('&') : '';\r",
-              "pm.request.headers.add({ key: \"{{apiKeyName}}\", value: pm.collectionVariables.get(\"API_Key\") });\r",
-              "\r",
-              "pm.environment.set(\"query\", (query ? query : \"\"));\r",
+							"\r",
+							"pm.environment.set(\"query\", (query ? query : \"\"));\r",
 							"\r",
 							"pm.environment.set(\"request\", activity.Request.Data != null ? JSON.stringify(activity.Request.Data): \"\");\r",
 							""
@@ -82,9 +81,9 @@
 				    "raw": "{{request}}",
 				    "options": {
 					"raw": {
-            "language": "json"
-            }
-          }
+				            "language": "json"
+				         }
+				     }
 				},
 				"url": {
 					"raw": "{{url.raw}}{{path}}?{{query}}",
@@ -103,6 +102,21 @@
 			"response": []
 		}
 	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{API_Key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "{{apiKeyName}}",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
@@ -127,9 +141,9 @@
 	],
 	"variable": [
   		{
-        "key": "API_Key",
-        "value": "{{apiKeyValue}}"
-		  }
+                    "key": "API_Key",
+                    "value": "{{apiKeyValue}}"
+		}
 	],
 	"protocolProfileBehavior": {}
 }
