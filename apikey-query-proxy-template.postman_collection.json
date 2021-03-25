@@ -103,6 +103,26 @@
 			"response": []
 		}
 	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{API_Key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "{{apiKeyName}}",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "query",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
