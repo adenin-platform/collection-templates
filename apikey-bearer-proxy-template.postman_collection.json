@@ -106,7 +106,7 @@
 		"type": "bearer",
 		"bearer": [
 			{
-				"key": "{{apiKeyName}}",
+				"key": "token",
 				"value": "{{API_Key}}",
 				"type": "string"
 			}
